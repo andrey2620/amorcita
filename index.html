@@ -35,7 +35,7 @@
     @keyframes fall { from { transform: translateY(-20px) rotate(0); opacity: 1; } to { transform: translateY(90vh) rotate(540deg); opacity: 0; } }
     @media (max-width: 520px) {
       main { padding: 12px; }
-      .card { width: 100%; min-height: calc(100vh - 24px); padding: 22px 14px 24px; box-shadow: 6px 6px 0 var(--ink); transform: none; }
+      .card { width: 100%; min-height: 0; padding: 22px 14px 36px; box-shadow: 6px 6px 0 var(--ink); transform: none; }
       .sticker { width: 145px; height: 145px; }
       .buttons { min-height: 90px; }
       .gallery { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 10px 3px 18px; margin-left: -2px; margin-right: -2px; }
@@ -77,12 +77,13 @@
     ];
 
     function dodge() {
+      if (!noButton.classList.contains('is-running')) document.body.append(noButton);
       noButton.classList.add('is-running');
       const padding = 18;
       const maxX = Math.max(padding, window.innerWidth - noButton.offsetWidth - padding);
       const maxY = Math.max(padding, window.innerHeight - noButton.offsetHeight - padding);
-      noButton.style.left = `${padding + Math.random() * (maxX - padding)}px`;
-      noButton.style.top = `${padding + Math.random() * (maxY - padding)}px`;
+      noButton.style.left = `${padding + Math.random() * Math.max(0, maxX - padding)}px`;
+      noButton.style.top = `${padding + Math.random() * Math.max(0, maxY - padding)}px`;
       noButton.textContent = ['No 🙈', 'nop', 'casi', 'intenta otra vez', 'no disponible'][Math.floor(Math.random() * 5)];
     }
 
@@ -96,6 +97,7 @@
     yesButton.addEventListener('click', () => {
       song.currentTime = 67;
       song.play().catch(() => {});
+      noButton.remove();
       question.classList.add('hide');
       success.classList.add('show');
       document.querySelector('#gallery').innerHTML = photos.map((photo, index) => `<img src="assets/${photo}" alt="Foto de nosotros ${index + 1}" style="animation-delay:${index * 55}ms">`).join('');
