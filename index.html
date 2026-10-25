@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>¿Volvemos?</title>
+  <style>
+    :root { --ink: #2e2431; --pink: #ff7eb6; --cream: #fff8ee; --yellow: #ffe680; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; color: var(--ink); background: #f6a8c7; font-family: "Comic Sans MS", "Trebuchet MS", sans-serif; overflow-x: hidden; }
+    main { min-height: 100vh; display: grid; place-items: center; padding: 28px 16px; }
+    .card { width: min(720px, 100%); padding: 30px 24px 34px; text-align: center; border: 4px solid var(--ink); border-radius: 20px; background: var(--cream); box-shadow: 10px 10px 0 var(--ink); transform: rotate(-1deg); }
+    .sticker { width: 180px; height: 180px; object-fit: cover; border: 4px solid var(--ink); border-radius: 18px; box-shadow: 6px 6px 0 var(--yellow); transform: rotate(2deg); }
+    h1 { margin: 22px 0 4px; font-size: clamp(2.4rem, 8vw, 5.5rem); line-height: .9; letter-spacing: -3px; }
+    .subtitle { margin: 14px auto 24px; max-width: 470px; font-size: 1.08rem; line-height: 1.45; }
+    .buttons { position: relative; display: flex; justify-content: center; align-items: center; gap: 14px; min-height: 72px; }
+    button { border: 3px solid var(--ink); border-radius: 12px; padding: 12px 28px; color: var(--ink); background: var(--yellow); font: inherit; font-weight: 900; font-size: 1.15rem; cursor: pointer; box-shadow: 4px 4px 0 var(--ink); transition: transform .12s, left .18s, top .18s; }
+    button:hover { transform: translate(-2px, -2px); }
+    #no { background: #ddd1dc; z-index: 2; }
+    #no.is-running { position: fixed; }
+    .tiny { margin-top: 28px; font-size: .78rem; opacity: .7; }
+    #success { display: none; }
+    #success.show { display: block; animation: pop .55s ease both; }
+    #question.hide { display: none; }
+    .success-title { font-size: clamp(2rem, 7vw, 4.2rem); margin: 8px 0; }
+    .heart-line { font-size: 2rem; letter-spacing: 8px; animation: float 1.5s ease-in-out infinite alternate; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 22px; }
+    .gallery img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border: 3px solid var(--ink); border-radius: 10px; background: #eee; box-shadow: 3px 3px 0 var(--pink); animation: photo-in .5s both; }
+    .gallery img:nth-child(2n) { transform: rotate(2deg); }
+    .gallery img:nth-child(3n) { transform: rotate(-2deg); }
+    .confetti { position: fixed; pointer-events: none; font-size: 2rem; animation: fall 1.6s ease-out forwards; }
+    @keyframes pop { from { opacity: 0; transform: scale(.8) rotate(-2deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+    @keyframes float { to { transform: translateY(-8px) rotate(3deg); } }
+    @keyframes photo-in { from { opacity: 0; transform: translateY(14px) scale(.96); } to { opacity: 1; } }
+    @keyframes fall { from { transform: translateY(-20px) rotate(0); opacity: 1; } to { transform: translateY(90vh) rotate(540deg); opacity: 0; } }
+    @media (max-width: 520px) { .card { padding: 24px 16px 28px; box-shadow: 6px 6px 0 var(--ink); } .sticker { width: 150px; height: 150px; } .gallery { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card" id="question" aria-labelledby="question-title">
+      <img class="sticker" src="assets/gatito.webp" alt="Un gatito poniendo carita triste">
+      <h1 id="question-title">¿Volvemos?</h1>
+      <p class="subtitle">Prometo que esta página fue hecha con amor, un poquito de vergüenza y demasiadas ganas de preguntarte algo importante.</p>
+      <div class="buttons" aria-label="Respuestas">
+        <button id="yes" type="button">Sí 💗</button>
+        <button id="no" type="button">No 🙈</button>
+      </div>
+      <p class="tiny">elige sabiamente jeje</p>
+    </section>
+
+    <section class="card" id="success" aria-live="polite">
+      <div class="heart-line">💞 ✨ 💞</div>
+      <h2 class="success-title">¡Sabía que sí!</h2>
+      <p class="subtitle">Entonces oficialmente volvemos a intentarlo. Mira nuestras pruebas de que juntos nos vemos bastante bien:</p>
+      <div class="gallery" id="gallery"></div>
+      <div class="heart-line">💗 🥹 💗</div>
+    </section>
+  </main>
+  <audio id="song" preload="auto" src="assets/los-mier-te-amo.ogg"></audio>
+  <script>
+    const noButton = document.querySelector('#no');
+    const yesButton = document.querySelector('#yes');
+    const question = document.querySelector('#question');
+    const success = document.querySelector('#success');
+    const song = document.querySelector('#song');
+    const photos = [
+      'IMG-20260425-WA0000.jpg', 'IMG-20260425-WA0001.jpg', 'IMG-20260425-WA0002.jpg',
+      'IMG-20260425-WA0003.jpg', 'IMG-20260425-WA0004.jpg', 'IMG-20260425-WA0005.jpg',
+      'IMG-20260425-WA0006.jpg', 'IMG-20260611-WA0013.jpg', 'IMG-20260618-WA0069.jpg',
+      'IMG-20260915-WA0073.jpg', 'IMG-20260922-WA0060.jpg', 'IMG-20260922-WA0119.jpg',
+      'IMG-20260922-WA0120.jpg', 'IMG-20260922-WA0121.jpg', 'IMG-20260922-WA0122.jpg'
+    ];
+
+    function dodge() {
+      noButton.classList.add('is-running');
+      const padding = 18;
+      const maxX = Math.max(padding, window.innerWidth - noButton.offsetWidth - padding);
+      const maxY = Math.max(padding, window.innerHeight - noButton.offsetHeight - padding);
+      noButton.style.left = `${padding + Math.random() * (maxX - padding)}px`;
+      noButton.style.top = `${padding + Math.random() * (maxY - padding)}px`;
+      noButton.textContent = ['No 🙈', 'nop', 'casi', 'intenta otra vez', 'no disponible'][Math.floor(Math.random() * 5)];
+    }
+
+    noButton.addEventListener('pointerenter', dodge);
+    noButton.addEventListener('pointerdown', (event) => { event.preventDefault(); dodge(); });
+    noButton.addEventListener('click', (event) => { event.preventDefault(); event.stopPropagation(); dodge(); });
+    noButton.addEventListener('keydown', (event) => { event.preventDefault(); dodge(); });
+    noButton.addEventListener('focus', () => { noButton.blur(); dodge(); });
+    window.addEventListener('resize', () => { if (noButton.classList.contains('is-running')) dodge(); });
+
+    yesButton.addEventListener('click', () => {
+      song.currentTime = 67;
+      song.play().catch(() => {});
+      question.classList.add('hide');
+      success.classList.add('show');
+      document.querySelector('#gallery').innerHTML = photos.map((photo, index) => `<img src="assets/${photo}" alt="Foto de nosotros ${index + 1}" style="animation-delay:${index * 55}ms">`).join('');
+      for (let i = 0; i < 20; i += 1) {
+        const confetti = document.createElement('span');
+        confetti.className = 'confetti';
+        confetti.textContent = ['💗', '✨', '💞', '🌸'][i % 4];
+        confetti.style.left = `${Math.random() * 100}vw`;
+        confetti.style.top = `${Math.random() * 15}vh`;
+        confetti.style.animationDelay = `${Math.random() * .5}s`;
+        document.body.append(confetti);
+        setTimeout(() => confetti.remove(), 2400);
+      }
+    });
+  </script>
+</body>
+</html>
