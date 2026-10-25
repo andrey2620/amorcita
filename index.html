@@ -38,8 +38,8 @@
       .card { width: 100%; min-height: calc(100vh - 24px); padding: 22px 14px 24px; box-shadow: 6px 6px 0 var(--ink); transform: none; }
       .sticker { width: 145px; height: 145px; }
       .buttons { min-height: 90px; }
-      .gallery { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 14px; padding: 10px 3px 18px; margin-left: -2px; margin-right: -2px; scrollbar-width: thin; }
-      .gallery img { flex: 0 0 78vw; max-width: 270px; scroll-snap-align: center; }
+      .gallery { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 10px 3px 18px; margin-left: -2px; margin-right: -2px; }
+      .gallery img { width: 100%; height: auto; max-width: none; aspect-ratio: auto; object-fit: contain; background: #f1e8ef; }
     }
   </style>
 </head>
